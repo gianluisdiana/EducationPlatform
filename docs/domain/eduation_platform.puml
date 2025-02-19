@@ -40,14 +40,13 @@
 
   Teacher ..> Topic
 
-  CompoundTopic *--> "+" Topic
-  Topic *--> Index
+  CompoundTopic o--> "+" Topic
+  CompoundTopic *--> Index
 
   Topic <|-- CompoundTopic
   Topic <|-- LeafTopic
 
-  Index --> "+" CompoundTopic
-  Index --> "+" LeafTopic
+  Index --> "+" Topic
 
   Itinerary o--> "+" Topic
 
@@ -78,30 +77,13 @@
   Progress --> Itinerary
 
   class Chat
-  abstract class Question
 
-  Question --> Concept
+  abstract class Question
 
   Chat o--> "*" Question
 
   EducationPlatform *--> Chat
 
-  Question <|-- MultipleChoiceQuestion
-  Question <|-- FillNameQuestion
-  Question <|-- RelatedConceptQuestion
-  Question <|-- OpenQuestion
-
-  abstract class OpenQuestion
-  class FillDefinitionQuestion {
-    + addDefinition(Concept) : void
-  }
-  class JustifyConceptQuestion {
-    + addJustification(Justification) : void
-  }
-  OpenQuestion <|-- JustifyConceptQuestion
-
-  OpenQuestion --> Teacher : checker
-  OpenQuestion ..> Concept
   Student --> Chat
 
   Concept o--> "*" JustifiableAnswer : wrongAnswers
@@ -112,9 +94,6 @@
 
   class JustifiableAnswer
 
-  Question <|-- WrongConceptQuestion
-  OpenQuestion <|-- FillDefinitionQuestion
-
   class ProgrammingExercise
   class DomainApplication
 
@@ -124,36 +103,6 @@
 
   DomainStatement o--> "*" DomainApplication : rightAnswers
   DomainStatement o--> "*" DomainApplication : wrongAnswers
-
-  Question <|-- AnswerChoiceQuestion
-
-  AnswerChoiceQuestion --> ProgrammingExercise
-  AnswerChoiceQuestion --> ProgrammingPrinciple
-
-  abstract class ProgrammingPrinciple
-  ' ProgrammingPrinciple <|-- ComprehensibilityPrinciple
-  ' ProgrammingPrinciple <|-- ModularityPrinciple
-  ' ProgrammingPrinciple <|-- ExtensibilityPrinciple
-
-  ' abstract class ComprehensibilityPrinciple
-  ' ComprehensibilityPrinciple <|-- UnificationPrinciple
-  ' ComprehensibilityPrinciple <|-- UniformityPrinciple
-  ' ComprehensibilityPrinciple <|-- MinimizationPrinciple
-
-  ' abstract class ModularityPrinciple
-  ' ModularityPrinciple <|-- AbstractionPrinciple
-  ' ModularityPrinciple <|-- SelfProtectionPrinciple
-  ' ModularityPrinciple <|-- CohesionPrinciple
-  ' ModularityPrinciple <|-- DecouplingPrinciple
-  ' ModularityPrinciple <|-- GranularizationPrinciple
-  ' ModularityPrinciple <|-- HierarchizationPrinciple
-  ' ModularityPrinciple <|-- DominancePrinciple
-  ' ModularityPrinciple <|-- TechnologyPrinciple
-
-  ' abstract class ExtensibilityPrinciple
-  ' ExtensibilityPrinciple <|-- SpecializationPrinciple
-  ' ExtensibilityPrinciple <|-- GeneralizationPrinciple
-  ' ExtensibilityPrinciple <|-- SubstitutionPrinciple
 
   class StudentRegister {
     + int timeInMinutesExpentInVideos

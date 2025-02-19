@@ -1,0 +1,54 @@
+@startuml questions
+  abstract class Question
+  Question --> Concept
+
+  Question <|-- MultipleChoiceQuestion
+  Question <|-- FillNameQuestion
+  Question <|-- RelatedConceptQuestion
+  Question <|-- OpenQuestion
+  Question <|-- WrongConceptQuestion
+
+  abstract class OpenQuestion
+
+  OpenQuestion --> Teacher : checker
+  OpenQuestion ..> Concept
+
+  class FillDefinitionQuestion {
+    + addDefinition(Concept) : void
+  }
+  class JustifyConceptQuestion {
+    + addJustification(Justification) : void
+  }
+  OpenQuestion <|-- JustifyConceptQuestion
+  OpenQuestion <|-- FillDefinitionQuestion
+
+  Question <|-- AnswerChoiceQuestion
+
+  AnswerChoiceQuestion --> ProgrammingExercise
+  AnswerChoiceQuestion --> ProgrammingPrinciple
+
+  abstract class ProgrammingPrinciple
+  ' ProgrammingPrinciple <|-- ComprehensibilityPrinciple
+  ' ProgrammingPrinciple <|-- ModularityPrinciple
+  ' ProgrammingPrinciple <|-- ExtensibilityPrinciple
+
+  ' abstract class ComprehensibilityPrinciple
+  ' ComprehensibilityPrinciple <|-- UnificationPrinciple
+  ' ComprehensibilityPrinciple <|-- UniformityPrinciple
+  ' ComprehensibilityPrinciple <|-- MinimizationPrinciple
+
+  ' abstract class ModularityPrinciple
+  ' ModularityPrinciple <|-- AbstractionPrinciple
+  ' ModularityPrinciple <|-- SelfProtectionPrinciple
+  ' ModularityPrinciple <|-- CohesionPrinciple
+  ' ModularityPrinciple <|-- DecouplingPrinciple
+  ' ModularityPrinciple <|-- GranularizationPrinciple
+  ' ModularityPrinciple <|-- HierarchizationPrinciple
+  ' ModularityPrinciple <|-- DominancePrinciple
+  ' ModularityPrinciple <|-- TechnologyPrinciple
+
+  ' abstract class ExtensibilityPrinciple
+  ' ExtensibilityPrinciple <|-- SpecializationPrinciple
+  ' ExtensibilityPrinciple <|-- GeneralizationPrinciple
+  ' ExtensibilityPrinciple <|-- SubstitutionPrinciple
+@enduml
