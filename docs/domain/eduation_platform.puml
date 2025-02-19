@@ -1,0 +1,172 @@
+@startuml education_platform
+
+  class Student {
+    + getSubItinerary(BaseItinerary) : Itinerary
+    + reorderItinerary(BaseItinerary) : Itinerary
+  }
+
+  abstract class BaseItinerary
+
+  class Itinerary
+
+  BaseItinerary <|-down- Itinerary
+
+  Student --> "*" Itinerary
+
+  class Teacher {
+    + addTopic(BaseItinerary) : Itinerary
+    + deleteTopic(BaseItinerary) : Itinerary
+    + examineStudentRegister(StudentRegister) : void
+  }
+
+  Teacher o--> "*" Itinerary
+
+  abstract class Topic
+  class CompoundTopic
+  class Index
+
+  Student <|-down- Teacher
+
+  abstract class InformationUnit
+
+  InformationUnit <|-down- Text
+  InformationUnit <|-down- Video
+  InformationUnit <|-down- Podcast
+  InformationUnit <|-down- Imagen
+
+  LeafTopic o--> "*" InformationUnit
+  LeafTopic *--> Video : classVideo
+  LeafTopic *--> Text : transcription
+
+  Teacher ..> Topic
+
+  CompoundTopic *--> "+" Topic
+  Topic *--> Index
+
+  Topic <|-- CompoundTopic
+  Topic <|-- LeafTopic
+
+  Index --> "+" CompoundTopic
+  Index --> "+" LeafTopic
+
+  Itinerary o--> "+" Topic
+
+  EducationPlatform o--> "*" Student
+  EducationPlatform o--> "+" Teacher
+  EducationPlatform *--> "+" Itinerary
+
+  class Concept {
+    + string name
+  }
+
+  LeafTopic o--> "+" Concept
+
+  Concept o--> "+" Text : definitions
+  Concept o--> "*" Text : wrongDefinitions
+  Concept o--> "*" Relation
+
+  abstract class Relation
+  ' Relation <|-- UseRelation
+  ' Relation <|-- AssociationRelation
+  ' Relation <|-- CompositionRelation
+  ' Relation <|-- InheritanceRelation
+  ' Relation <|-- AggregationRelation
+
+  class Progress
+
+  Student *--> Progress
+  Progress --> Itinerary
+
+  class Chat
+  abstract class Question
+
+  Question --> Concept
+
+  Chat o--> "*" Question
+
+  EducationPlatform *--> Chat
+
+  Question <|-- MultipleChoiceQuestion
+  Question <|-- FillNameQuestion
+  Question <|-- RelatedConceptQuestion
+  Question <|-- OpenQuestion
+
+  abstract class OpenQuestion
+  class FillDefinitionQuestion {
+    + addDefinition(Concept) : void
+  }
+  class JustifyConceptQuestion {
+    + addJustification(Justification) : void
+  }
+  OpenQuestion <|-- JustifyConceptQuestion
+
+  OpenQuestion --> Teacher : checker
+  OpenQuestion ..> Concept
+  Student --> Chat
+
+  Concept o--> "*" JustifiableAnswer : wrongAnswers
+  Concept o--> "*" JustifiableAnswer : rightAnswers
+
+  JustifiableAnswer o--> "*" Justification : wrongJustifications
+  JustifiableAnswer o--> "*" Justification : rightJustifications
+
+  class JustifiableAnswer
+
+  Question <|-- WrongConceptQuestion
+  OpenQuestion <|-- FillDefinitionQuestion
+
+  class ProgrammingExercise
+  class DomainApplication
+
+  abstract class Answer
+  Answer <|-- JustifiableAnswer
+  Answer <|-- DomainApplication
+
+  DomainStatement o--> "*" DomainApplication : rightAnswers
+  DomainStatement o--> "*" DomainApplication : wrongAnswers
+
+  Question <|-- AnswerChoiceQuestion
+
+  AnswerChoiceQuestion --> ProgrammingExercise
+  AnswerChoiceQuestion --> ProgrammingPrinciple
+
+  abstract class ProgrammingPrinciple
+  ' ProgrammingPrinciple <|-- ComprehensibilityPrinciple
+  ' ProgrammingPrinciple <|-- ModularityPrinciple
+  ' ProgrammingPrinciple <|-- ExtensibilityPrinciple
+
+  ' abstract class ComprehensibilityPrinciple
+  ' ComprehensibilityPrinciple <|-- UnificationPrinciple
+  ' ComprehensibilityPrinciple <|-- UniformityPrinciple
+  ' ComprehensibilityPrinciple <|-- MinimizationPrinciple
+
+  ' abstract class ModularityPrinciple
+  ' ModularityPrinciple <|-- AbstractionPrinciple
+  ' ModularityPrinciple <|-- SelfProtectionPrinciple
+  ' ModularityPrinciple <|-- CohesionPrinciple
+  ' ModularityPrinciple <|-- DecouplingPrinciple
+  ' ModularityPrinciple <|-- GranularizationPrinciple
+  ' ModularityPrinciple <|-- HierarchizationPrinciple
+  ' ModularityPrinciple <|-- DominancePrinciple
+  ' ModularityPrinciple <|-- TechnologyPrinciple
+
+  ' abstract class ExtensibilityPrinciple
+  ' ExtensibilityPrinciple <|-- SpecializationPrinciple
+  ' ExtensibilityPrinciple <|-- GeneralizationPrinciple
+  ' ExtensibilityPrinciple <|-- SubstitutionPrinciple
+
+  class StudentRegister {
+    + int timeInMinutesExpentInVideos
+    + int timeInMinutesExpentInChatQuestions
+    + int percentageCompleted
+  }
+
+  LeafTopic o--> "*" ProgrammingExercise
+
+  Student *--> StudentRegister
+  Teacher ..> StudentRegister
+
+  ProgrammingExercise o--> "+" DomainStatement : versionedStatements
+  ProgrammingExercise --> "*" Concept
+
+@enduml
