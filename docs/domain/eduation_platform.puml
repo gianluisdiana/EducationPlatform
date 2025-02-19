@@ -1,21 +1,17 @@
 @startuml education_platform
 
   class Student {
-    + getSubItinerary(BaseItinerary) : Itinerary
-    + reorderItinerary(BaseItinerary) : Itinerary
+    + getSubItinerary(Itinerary) : Itinerary
+    + reorderItinerary(Itinerary) : Itinerary
   }
-
-  abstract class BaseItinerary
 
   class Itinerary
 
-  BaseItinerary <|-down- Itinerary
-
-  Student --> "*" Itinerary
+  Student --> Itinerary
 
   class Teacher {
-    + addTopic(BaseItinerary) : Itinerary
-    + deleteTopic(BaseItinerary) : Itinerary
+    + addTopic(Itinerary) : Itinerary
+    + deleteTopic(Itinerary) : Itinerary
     + examineStudentRegister(StudentRegister) : void
   }
 
@@ -34,9 +30,9 @@
   InformationUnit <|-down- Podcast
   InformationUnit <|-down- Imagen
 
-  LeafTopic o--> "*" InformationUnit
-  LeafTopic *--> Video : classVideo
-  LeafTopic *--> Text : transcription
+  SimpleTopic o--> "*" InformationUnit
+  SimpleTopic *--> Video : classVideo
+  SimpleTopic *--> Text : transcription
 
   Teacher ..> Topic
 
@@ -44,7 +40,7 @@
   CompoundTopic *--> Index
 
   Topic <|-- CompoundTopic
-  Topic <|-- LeafTopic
+  Topic <|-- SimpleTopic
 
   Index --> "+" Topic
 
@@ -52,29 +48,31 @@
 
   EducationPlatform o--> "*" Student
   EducationPlatform o--> "+" Teacher
-  EducationPlatform *--> "+" Itinerary
+  EducationPlatform *--> Itinerary : baseItinerary
+  EducationPlatform o--> "*" Itinerary
 
   class Concept {
     + string name
   }
 
-  LeafTopic o--> "+" Concept
+  SimpleTopic o--> "+" Concept
 
   Concept o--> "+" Text : definitions
   Concept o--> "*" Text : wrongDefinitions
-  Concept o--> "*" Relation
+  Concept o--> "*" RelationType
 
-  abstract class Relation
-  ' Relation <|-- UseRelation
-  ' Relation <|-- AssociationRelation
-  ' Relation <|-- CompositionRelation
-  ' Relation <|-- InheritanceRelation
-  ' Relation <|-- AggregationRelation
+  Relation *--> RelationType
+  Relation --> Concept : originConcept
+  Relation --> Concept : destinationConcept
 
-  class Progress
-
-  Student *--> Progress
-  Progress --> Itinerary
+  SimpleTopic o--> "*" RelationType
+  enum RelationType {
+    Use
+    Association
+    Composition
+    Inheritance
+    Aggregation
+  }
 
   class Chat
 
@@ -110,10 +108,12 @@
     + int percentageCompleted
   }
 
-  LeafTopic o--> "*" ProgrammingExercise
+  SimpleTopic o--> "*" ProgrammingExercise
+  SimpleTopic o--> "*" Relation
 
   Student *--> StudentRegister
   Teacher ..> StudentRegister
+  StudentRegister --> Itinerary
 
   ProgrammingExercise o--> "+" DomainStatement : versionedStatements
   ProgrammingExercise --> "*" Concept
