@@ -1,121 +1,145 @@
 @startuml education_platform
 
-  class Student {
-    + getSubItinerary(Itinerary) : Itinerary
-    + reorderItinerary(Itinerary) : Itinerary
-  }
+  title Education Platform Domain
+
+  class EducationPlatform
+  EducationPlatform *--> Itinerary : baseItinerary
+  EducationPlatform o--> "*" Itinerary
 
   class Itinerary
 
-  Student --> Itinerary
-
-  class Teacher {
-    + addTopic(Itinerary) : Itinerary
-    + deleteTopic(Itinerary) : Itinerary
-    + examineStudentRegister(StudentRegister) : void
-  }
-
-  Teacher o--> "*" Itinerary
-
   abstract class Topic
-  class CompoundTopic
-  class Index
+  Itinerary o--> "*" Topic
+  EducationPlatform *--> Topic : baseTopic
 
-  Student <|-down- Teacher
+  class CompoundTopic
+  Topic <|-down- CompoundTopic
+  CompoundTopic o--> "*" Topic
+
+  class SimpleTopic
+  Topic <|-down- SimpleTopic
 
   abstract class InformationUnit
-
-  InformationUnit <|-down- Text
-  InformationUnit <|-down- Video
-  InformationUnit <|-down- Podcast
-  InformationUnit <|-down- Imagen
-
   SimpleTopic o--> "*" InformationUnit
-  SimpleTopic *--> Video : classVideo
-  SimpleTopic *--> Text : transcription
 
-  Teacher ..> Topic
+  class Text
+  InformationUnit <|-down- Text
+  class Video
+  InformationUnit <|-down- Video
+  Video o--> "?" Text : transcription
 
-  CompoundTopic o--> "+" Topic
-  CompoundTopic *--> Index
-
-  Topic <|-- CompoundTopic
-  Topic <|-- SimpleTopic
-
-  Index --> "+" Topic
-
-  Itinerary o--> "+" Topic
-
-  EducationPlatform o--> "*" Student
-  EducationPlatform o--> "+" Teacher
-  EducationPlatform *--> Itinerary : baseItinerary
-  EducationPlatform o--> "*" Itinerary
+  class Podcast
+  InformationUnit <|-down- Podcast
+  Video o--> "?" Podcast
+  
+  class Imagen
+  InformationUnit <|-down- Imagen
 
   class Concept {
     + string name
   }
+  SimpleTopic o--> "*" Concept
 
-  SimpleTopic o--> "+" Concept
-
-  Concept o--> "+" Text : definitions
-  Concept o--> "*" Text : wrongDefinitions
-  Concept o--> "*" RelationType
-
-  Relation *--> RelationType
+  class Relation
+  SimpleTopic o--> "*" Relation
   Relation --> Concept : originConcept
   Relation --> Concept : destinationConcept
 
-  SimpleTopic o--> "*" RelationType
   enum RelationType {
-    Use
-    Association
-    Composition
-    Inheritance
-    Aggregation
+    + Inheritance
+    + Composition
+    + Aggregation
+    + Association
+    + Use
+  }
+  Relation *--> RelationType
+  
+  class Definition
+  Concept o--> "*" Definition
+
+  class Justification {
+    + bool isCorrect
   }
 
-  class Chat
-
-  abstract class Question
-
-  Chat o--> "*" Question
-
-  EducationPlatform *--> Chat
-
-  Student --> Chat
-
-  Concept o--> "*" JustifiableAnswer : wrongAnswers
-  Concept o--> "*" JustifiableAnswer : rightAnswers
-
-  JustifiableAnswer o--> "*" Justification : wrongJustifications
-  JustifiableAnswer o--> "*" Justification : rightJustifications
-
-  class JustifiableAnswer
+  Text <|-down- Justification
+  Definition o--> "*" Justification
 
   class ProgrammingExercise
-  class DomainApplication
+  SimpleTopic --> "*" ProgrammingExercise
+  Itinerary o--> "*" ProgrammingExercise
+  ProgrammingExercise --> "*" Concept
 
-  abstract class Answer
-  Answer <|-- JustifiableAnswer
-  Answer <|-- DomainApplication
+  class Statement
+  ProgrammingExercise o--> "*" Statement : versionedStatements
 
-  DomainStatement o--> "*" DomainApplication : rightAnswers
-  DomainStatement o--> "*" DomainApplication : wrongAnswers
+  class Answer {
+    + bool isCorrect
+  }
+  Text <|-down- Answer
+  Answer <|-down- Definition
+  Statement --> Answer : application
+  ProgrammingExercise o--> "*" Answer : versionedApplications
 
-  class StudentRegister {
-    + int timeInMinutesExpentInVideos
-    + int timeInMinutesExpentInChatQuestions
-    + int percentageCompleted
+  ' ------------------- Chat and questions ------------------- '
+
+  class Chat
+  EducationPlatform o--> "*" Chat
+
+  abstract class Question
+  EducationPlatform o--> "*" Question
+  Chat --> "*" Question
+  Question --> Concept
+
+  abstract class OpenQuestion
+  Question <|-down- OpenQuestion
+  OpenQuestion o--> Definition
+
+  class FillDefinitionQuestion {
+    + addDefinition() : void
+  }
+  class JustifyConceptQuestion {
+    + addJustification() : void
+  }
+  OpenQuestion <|-down- JustifyConceptQuestion
+  OpenQuestion <|-down- FillDefinitionQuestion
+
+  class BestApplicationQuestion
+  Question <|-down- BestApplicationQuestion
+  BestApplicationQuestion ..> "2" Answer
+  BestApplicationQuestion --> ProgrammingExercise
+
+  enum ProgrammingPrinciple {
+    + SingleResponsibility
+    + AcyclicDependencies
+    + CommonClosure
+    + InterfaceSegregation
+    + ...
+  }
+  BestApplicationQuestion *--> ProgrammingPrinciple
+
+  ' ------------------- Actors -------------------
+
+  abstract class User
+  EducationPlatform o--> "*" User
+
+  class Teacher
+  User <|-down- Teacher
+  Itinerary --> Teacher : creator
+  OpenQuestion --> "?" Teacher : checker
+
+  class Student
+  User <|-down- Student
+
+  class Progress {
+    + int timeInMinutesSpentInVideos
+    + int timeInMinutesSpentInChatQuestions
+    + int percentageComplete
   }
 
-  SimpleTopic o--> "*" ProgrammingExercise
-  SimpleTopic o--> "*" Relation
-
-  Student *--> StudentRegister
-  Teacher ..> StudentRegister
-  StudentRegister --> Itinerary
-
-  ProgrammingExercise o--> "+" DomainStatement : versionedStatements
-  ProgrammingExercise --> "*" Concept
+  class StudentSubscription
+  StudentSubscription *--> Student
+  StudentSubscription *--> Progress
+  Itinerary o--> "*" StudentSubscription : subscribers
+  Chat o--> StudentSubscription
 
 @enduml
