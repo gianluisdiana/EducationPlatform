@@ -3,143 +3,156 @@
   title Education Platform Domain
 
   class EducationPlatform
-  EducationPlatform *--> Itinerary : baseItinerary
-  EducationPlatform o--> "*" Itinerary
 
-  class Itinerary
+  package Itineraries {
+    class Itinerary
+    EducationPlatform *--> Itinerary : baseItinerary
+    EducationPlatform o--> "*" Itinerary
 
-  abstract class Topic
-  Itinerary o--> "*" Topic
-  EducationPlatform *--> Topic : baseTopic
+    abstract class Topic
+    Itinerary o--> "*" Topic
+    EducationPlatform *--> Topic : baseTopic
 
-  class CompoundTopic
-  Topic <|-down- CompoundTopic
-  CompoundTopic o--> "*" Topic
+    class CompoundTopic
+    Topic <|-down- CompoundTopic
+    CompoundTopic o--> "*" Topic
 
-  class SimpleTopic
-  Topic <|-down- SimpleTopic
+    class SimpleTopic
+    Topic <|-down- SimpleTopic
 
-  abstract class InformationUnit
-  SimpleTopic o--> "*" InformationUnit
+    package Relations {
+      class Relation
+      SimpleTopic o--> "*" Relation
 
-  class Text
-  InformationUnit <|-down- Text
-  class Video
-  InformationUnit <|-down- Video
-  Video o--> "?" Text : transcription
+      enum RelationType {
+        + Inheritance
+        + Composition
+        + Aggregation
+        + Association
+        + Use
+      }
+      Relation *--> RelationType
+    }
 
-  class Podcast
-  InformationUnit <|-down- Podcast
-  Video o--> "?" Podcast
-  
-  class Imagen
-  InformationUnit <|-down- Imagen
+    package InformationUnits {
+      abstract class InformationUnit
+      SimpleTopic o--> "*" InformationUnit
 
-  class Concept {
-    + string name
+      class Text
+      InformationUnit <|-down- Text
+      class Video
+      InformationUnit <|-down- Video
+      Video o--> "?" Text : transcription
+
+      class Podcast
+      InformationUnit <|-down- Podcast
+      Video o--> "?" Podcast
+
+      class Imagen
+      InformationUnit <|-down- Imagen
+    }
+
+    package Concepts {
+      class Concept {
+        + string name
+      }
+      SimpleTopic o--> "*" Concept
+      Relation --> Concept : originConcept
+      Relation --> Concept : destinationConcept
+
+      class Definition
+      Concept o--> "*" Definition
+
+      class Justification {
+        + bool isCorrect
+      }
+      Text <|-down- Justification
+      Definition o--> "*" Justification
+    }
+
+    package Exercises {
+      class ProgrammingExercise
+      SimpleTopic --> "*" ProgrammingExercise
+      Itinerary o--> "*" ProgrammingExercise
+      ProgrammingExercise --> "*" Concept
+
+      class Statement
+      ProgrammingExercise o--> "*" Statement : versionedStatements
+
+      class Answer {
+        + bool isCorrect
+      }
+      Text <|-down- Answer
+      Answer <|-down- Definition
+      Statement --> Answer : application
+      ProgrammingExercise o--> "*" Answer : versionedApplications
+    }
   }
-  SimpleTopic o--> "*" Concept
-
-  class Relation
-  SimpleTopic o--> "*" Relation
-  Relation --> Concept : originConcept
-  Relation --> Concept : destinationConcept
-
-  enum RelationType {
-    + Inheritance
-    + Composition
-    + Aggregation
-    + Association
-    + Use
-  }
-  Relation *--> RelationType
-  
-  class Definition
-  Concept o--> "*" Definition
-
-  class Justification {
-    + bool isCorrect
-  }
-
-  Text <|-down- Justification
-  Definition o--> "*" Justification
-
-  class ProgrammingExercise
-  SimpleTopic --> "*" ProgrammingExercise
-  Itinerary o--> "*" ProgrammingExercise
-  ProgrammingExercise --> "*" Concept
-
-  class Statement
-  ProgrammingExercise o--> "*" Statement : versionedStatements
-
-  class Answer {
-    + bool isCorrect
-  }
-  Text <|-down- Answer
-  Answer <|-down- Definition
-  Statement --> Answer : application
-  ProgrammingExercise o--> "*" Answer : versionedApplications
 
   ' ------------------- Chat and questions ------------------- '
 
-  class Chat
-  EducationPlatform o--> "*" Chat
+  package Questions {
+    class Chat
+    EducationPlatform o--> "*" Chat
 
-  abstract class Question
-  EducationPlatform o--> "*" Question
-  Chat --> "*" Question
-  Question --> Concept
+    abstract class Question
+    EducationPlatform o--> "*" Question
+    Chat --> "*" Question
+    Question --> Concept
 
-  abstract class OpenQuestion
-  Question <|-down- OpenQuestion
-  OpenQuestion o--> Definition
+    abstract class OpenQuestion
+    Question <|-down- OpenQuestion
+    OpenQuestion o--> Definition
 
-  class FillDefinitionQuestion {
-    + addDefinition() : void
-  }
-  class JustifyConceptQuestion {
-    + addJustification() : void
-  }
-  OpenQuestion <|-down- JustifyConceptQuestion
-  OpenQuestion <|-down- FillDefinitionQuestion
+    class FillDefinitionQuestion {
+      + addDefinition() : void
+    }
+    class JustifyConceptQuestion {
+      + addJustification() : void
+    }
+    OpenQuestion <|-down- JustifyConceptQuestion
+    OpenQuestion <|-down- FillDefinitionQuestion
 
-  class BestApplicationQuestion
-  Question <|-down- BestApplicationQuestion
-  BestApplicationQuestion ..> "2" Answer
-  BestApplicationQuestion --> ProgrammingExercise
+    class BestApplicationQuestion
+    Question <|-down- BestApplicationQuestion
+    BestApplicationQuestion ..> "2" Answer
+    BestApplicationQuestion --> ProgrammingExercise
 
-  enum ProgrammingPrinciple {
-    + SingleResponsibility
-    + AcyclicDependencies
-    + CommonClosure
-    + InterfaceSegregation
-    + ...
-  }
-  BestApplicationQuestion *--> ProgrammingPrinciple
-
-  ' ------------------- Actors -------------------
-
-  abstract class User
-  EducationPlatform o--> "*" User
-
-  class Teacher
-  User <|-down- Teacher
-  Itinerary --> Teacher : creator
-  OpenQuestion --> "?" Teacher : checker
-
-  class Student
-  User <|-down- Student
-
-  class Progress {
-    + int timeInMinutesSpentInVideos
-    + int timeInMinutesSpentInChatQuestions
-    + int percentageComplete
+    enum ProgrammingPrinciple {
+      + SingleResponsibility
+      + AcyclicDependencies
+      + CommonClosure
+      + InterfaceSegregation
+      + ...
+    }
+    BestApplicationQuestion *--> ProgrammingPrinciple
   }
 
-  class StudentSubscription
-  StudentSubscription *--> Student
-  StudentSubscription *--> Progress
-  Itinerary o--> "*" StudentSubscription : subscribers
-  Chat o--> StudentSubscription
+  ' ------------------- Actors ------------------- '
+
+  package Users {
+    abstract class User
+    EducationPlatform o--> "*" User
+
+    class Teacher
+    User <|-down- Teacher
+    Itinerary --> Teacher : creator
+    OpenQuestion --> "?" Teacher : checker
+
+    class Student
+    User <|-down- Student
+
+    class Progress {
+      + int timeInMinutesSpentInVideos
+      + int timeInMinutesSpentInChatQuestions
+      + int percentageComplete
+    }
+
+    class StudentSubscription
+    StudentSubscription *--> Student
+    StudentSubscription *--> Progress
+    Itinerary o--> "*" StudentSubscription : subscribers
+    Chat o--> StudentSubscription
+  }
 
 @enduml
