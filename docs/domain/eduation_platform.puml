@@ -4,7 +4,7 @@
 
   class EducationPlatform
 
-  package Itineraries {
+  package Content {
     class Itinerary
     EducationPlatform *--> Itinerary : baseItinerary
     EducationPlatform o--> "*" Itinerary
@@ -20,26 +20,13 @@
     class SimpleTopic
     Topic <|-down- SimpleTopic
 
-    package Relations {
-      class Relation
-      SimpleTopic o--> "*" Relation
-
-      enum RelationType {
-        + Inheritance
-        + Composition
-        + Aggregation
-        + Association
-        + Use
-      }
-      Relation *--> RelationType
-    }
-
     package InformationUnits {
       abstract class InformationUnit
       SimpleTopic o--> "*" InformationUnit
 
       class Text
       InformationUnit <|-down- Text
+
       class Video
       InformationUnit <|-down- Video
       Video o--> "?" Text : transcription
@@ -52,11 +39,21 @@
       InformationUnit <|-down- Imagen
     }
 
-    package Concepts {
+    package Knowledge {
+      enum RelationType {
+        + Inheritance
+        + Composition
+        + Aggregation
+        + Association
+        + Use
+      }
+
+      class Relation
+      Relation *--> RelationType
+
       class Concept {
         + string name
       }
-      SimpleTopic o--> "*" Concept
       Relation --> Concept : originConcept
       Relation --> Concept : destinationConcept
 
@@ -68,36 +65,40 @@
       }
       Text <|-down- Justification
       Definition o--> "*" Justification
+
+      class KnowledgeBase
+      Itinerary *--> KnowledgeBase
+      KnowledgeBase *--> "*" Concept
+      KnowledgeBase *--> "*" Relation
     }
 
     package Exercises {
       class ProgrammingExercise
       SimpleTopic --> "*" ProgrammingExercise
       Itinerary o--> "*" ProgrammingExercise
-      ProgrammingExercise --> "*" Concept
+      ProgrammingExercise --> KnowledgeBase
 
-      class Statement
-      ProgrammingExercise o--> "*" Statement : versionedStatements
+      class DomainStatement
+      ProgrammingExercise o--> "*" DomainStatement : versionedStatements
 
       class Answer {
         + bool isCorrect
       }
       Text <|-down- Answer
       Answer <|-down- Definition
-      Statement --> Answer : application
-      ProgrammingExercise o--> "*" Answer : versionedApplications
+      DomainStatement o--> "*" Answer : applications
     }
   }
 
   ' ------------------- Chat and questions ------------------- '
 
   package Questions {
-    class Chat
-    EducationPlatform o--> "*" Chat
+    class Conversation
+    EducationPlatform o--> "*" Conversation
 
     abstract class Question
     EducationPlatform o--> "*" Question
-    Chat --> "*" Question
+    Conversation --> "*" Question
     Question --> Concept
 
     abstract class OpenQuestion
@@ -144,7 +145,7 @@
 
     class Progress {
       + int timeInMinutesSpentInVideos
-      + int timeInMinutesSpentInChatQuestions
+      + int timeInMinutesSpentInConversationQuestions
       + int percentageComplete
     }
 
@@ -152,7 +153,7 @@
     StudentSubscription *--> Student
     StudentSubscription *--> Progress
     Itinerary o--> "*" StudentSubscription : subscribers
-    Chat o--> StudentSubscription
+    Conversation o--> StudentSubscription
   }
 
 @enduml
